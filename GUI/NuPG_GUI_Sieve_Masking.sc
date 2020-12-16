@@ -3,6 +3,7 @@ NuPG_GUI_Sieve_Masking {
 	var <>window;
 	var <>stack;
 	var <>sieveOnOff;
+	var <>path;
 
 	build {|data, colorScheme = 0|
 
@@ -46,14 +47,14 @@ NuPG_GUI_Sieve_Masking {
 			slotGrid[i][0].addSpanning(sieveInput, 2, 0);
 			sieveInput.syntaxColorize;
 			sieveInput.palette_(QPalette.light);
-			sieveInput.open(Platform.userExtensionDir +/+ "NuPg_sieveMaskGenerators.txt");
+			sieveInput.open(path ++ "NuPg_sieveMaskGenerators.txt");
 
 
 			slotGrid[i][1].addSpanning(defs.nuPGText("_LOGICAL OPERATORS", 20, 160), 0, 0, columnSpan: 2);
 			slotGrid[i][1].addSpanning(sieveOperator, 1, 0, columnSpan: 2);
 			sieveOperator.syntaxColorize;
 			sieveOperator.palette_(QPalette.light);
-			sieveOperator.open(Platform.userExtensionDir +/+ "NuPg_sieveMaskOperators.txt");
+			sieveOperator.open(path ++ "NuPg_sieveMaskOperators.txt");
 			sieveOperator.enterInterpretsSelection_(true);
 
 			sieveOperator.mouseUpAction_{|it, x, y, modifiers, buttonNumber, clickCount, pos|
@@ -82,11 +83,11 @@ NuPG_GUI_Sieve_Masking {
 			slotGrid[i][1].addSpanning(Button().states_([["formula save"]]).action_({|butt|
 				var fileGenerators, fileOperators;
 				//write generators data
-				fileGenerators = File.new(Platform.userExtensionDir +/+ "NuPg_sieveMaskGenerators.txt", "w");
+				fileGenerators = File.new(path ++ "NuPg_sieveMaskGenerators.txt", "w");
 				fileGenerators.write(sieveInput.string);
 				fileGenerators.close;
 				//write operators data
-				fileGenerators = File.new(Platform.userExtensionDir +/+ "NuPg_sieveMaskOperators.txt", "w");
+				fileGenerators = File.new(path ++ "NuPg_sieveMaskOperators.txt", "w");
 				fileGenerators.write(sieveOperator.string);
 				fileGenerators.close;
 				"SIEVE MASK FORMULA SAVED".postln;

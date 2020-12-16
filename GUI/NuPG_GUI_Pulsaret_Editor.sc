@@ -20,6 +20,7 @@ NuPG_GUI_Pulsaret_Editor {
 		var files = {|tablePath| ["/*.wav", "/*.aiff"].collect{|item|  (tablePath ++ item).pathMatch}.flatten };
 		var fileNames = files.value(defaultTablePath).collect{|i| PathName(i).fileName};
 		var dataPlotter = NuPG_Plotter.new;
+		var copyData = NuPG_DataCopy;
 		//wavelet tasks
 		var pulsaretWT = NuPG_Ndefs.pulsaretWT(buffer, data);
 		var waveletTypes = [
@@ -44,6 +45,25 @@ NuPG_GUI_Pulsaret_Editor {
 
 		//view for each stack
 		view = 3.collect{defs.nuPGView(1)};
+		//add copy/paste functionality
+		3.collect{|i|
+			view[i].keyDownAction_({arg view,char,modifiers,unicode,keycode;
+				//copy
+				if(keycode == 8,
+
+					{copyData.copyData(data.data_pulsaret[i].input);
+						"copy data".postln},
+					{});
+                //paste
+				if(keycode == 35,
+					{   //update the CV
+						data.data_pulsaret[i].input = copyData.pasteData;
+						//update the buffer
+						buffer[i][0].sendCollection(copyData.pasteData);
+						"paste data".postln},
+					{})
+			})
+		};
 		//view layout
 		viewLayout = 3.collect{GridLayout.new()};
 

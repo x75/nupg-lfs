@@ -132,9 +132,9 @@ NuPG_GUI_definitions {
 
 	*nuPGView  {|colorScheme|
 		var view =  CompositeView.new()
-		.background_(this.nuPGBackground(colorScheme))
-		.keyDownAction_({arg view,char,modifiers,unicode,keycode;
-			[char,modifiers,unicode,keycode].postln});
+		.background_(this.nuPGBackground(colorScheme));
+		/*.keyDownAction_({arg view,char,modifiers,unicode,keycode;
+			[char,modifiers,unicode,keycode].postln});*/
 		^view
 	}
 

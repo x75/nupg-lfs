@@ -6,16 +6,18 @@ NuPG_GUI_Graph_Editor {
 	var <>scanningSlider;
 	var <>numBox;
 	var <>menu;
-	var <> dataToPDF;
-    var <>tablePath;
+	var <>loadFolder, <>defFolder, <>splitFile;
+	var <>dataToPDF;
+    var <>tablePath, <>defaultTablePath;
 
 	build {|colorScheme = 0, coordinates, data, paramName, dataSlot|
 
 		var view, viewLayout, slotGrid, slots, actions;
 		var defs = NuPG_GUI_definitions;
-		var files=(tablePath ++"/*.wav").pathMatch;
-		var fileNames = files.collect{|i| PathName(i).fileName};
+		var files = {|tablePath| ["/*.wav", "/*.aiff"].collect{|item|  (tablePath ++ item).pathMatch}.flatten };
+		var fileNames = files.value(defaultTablePath).collect{|i| PathName(i).fileName};
 		var dataPlotter = NuPG_Plotter.new;
+		var copyData = NuPG_DataCopy;
 
 
 		window = Window.new(paramName,
@@ -25,6 +27,23 @@ NuPG_GUI_Graph_Editor {
 
 		//view for each stack
 		view = 3.collect{defs.nuPGView(1)};
+		//add copy/paste functionality
+		3.collect{|i|
+			view[i].keyDownAction_({arg view,char,modifiers,unicode,keycode;
+				//copy
+				if(keycode == 8,
+
+					{copyData.copyData(data.data_sequencer[i][dataSlot].input);
+						"copy data".postln},
+					{});
+                //paste
+				if(keycode == 35,
+					{   //update the CV
+						data.data_sequencer[i][dataSlot].input = copyData.pasteData;
+						"paste data".postln},
+					{})
+			})
+		};
 		//view layout
 		viewLayout = 3.collect{GridLayout.new()};
     	3.collect{|i| view[i].layout_(viewLayout[i].margins_([3,3,3,3]).spacing_(1))};
@@ -42,13 +61,17 @@ NuPG_GUI_Graph_Editor {
 		numBox = 3.collect{2.collect{}};
 		//menus
 		menu = 3.collect{};
+		//load folder
+		loadFolder = 3.collect{};
+		defFolder = 3.collect{};
+		splitFile = 3.collect{};
 		//save data as PDF
 		dataToPDF =  3.collect{};
 
 		3.collect{|i|
 			var label = ["_max", "_min"];
 			var shiftT = [0, 8];
-			var shiftN =[1, 9];
+			var shiftN =[9, 1];
 
 			//scanningSlider
 			scanningSlider[i] = defs.nuPGSlider()
@@ -126,6 +149,7 @@ NuPG_GUI_Graph_Editor {
 			slotGrid[i][2].addSpanning(menu[i], 0, 2);
 			menu[i].items = [];
 			menu[i].items = fileNames;
+			tablePath = defaultTablePath;
 
 			menu[i].action_({|item|
 				var size, dataFile, file, temp, array;
@@ -142,10 +166,97 @@ NuPG_GUI_Graph_Editor {
 				fileNames[menu[i].value].postln;
 			});
 
+			loadFolder[i] = defs.nuPGButton([["folder"]], 20, 50)
+			.action_({
+				FileDialog({ |path|
+					postln("Selected file:" + path);
+					postln("File type is:" + File.type(path));
+					//update the tablepath
+					tablePath =  path ++ "/";
+					files = {|tablePath| ["/*.wav", "/*.aiff"].collect{|item|  (tablePath ++ item).pathMatch}.flatten };
+	                files.value(tablePath).postln;
+					fileNames = files.value(tablePath).collect{|i| PathName(i).fileName};
+                    //update the menu items
+					menu[i].items = fileNames;
+				},
+				fileMode: 0,
+				stripResult: true);
+			});
+			slotGrid[i][2].addSpanning(loadFolder[i], 0, 3);
+
+			defFolder[i] = defs.nuPGButton([["defFolder"]], 20, 50)
+			.action_({
+					//postln("Selected file:" + path);
+					//postln("File type is:" + File.type(path));
+					//update the tablepath
+					tablePath =  defaultTablePath;
+					files = {|tablePath| ["/*.wav", "/*.aiff"].collect{|item|  (tablePath ++ item).pathMatch}.flatten };
+	                files.value(tablePath).postln;
+					fileNames = files.value(tablePath).collect{|i| PathName(i).fileName};
+                    //update the menu items
+					menu[i].items = fileNames;
+			});
+			slotGrid[i][2].addSpanning(defFolder[i], 0, 4);
+
+			splitFile[i] = defs.nuPGButton([["splitFile"]], 20, 50)
+			.action_({
+				var env, fileName, slicesFolder, dataFile, file, fileToFloatArray, sliceFile, sliceEnv;
+					FileDialog({ |path|
+					postln("Selected file:" + path);
+					//postln("File type is:" + File.type(path));
+					dataFile = path;
+				    dataFile.postln;
+					//get file into floatarray
+					file = SoundFile.openRead(path);
+					fileToFloatArray = FloatArray.newClear(file.numFrames * file.numChannels);
+					file.readData(fileToFloatArray);
+					//get file's name and create a folder for slices
+					fileName = PathName(path).fileName;
+					slicesFolder = File.makeDir(path ++ "_SLICES");
+					//function for slicing
+					env = {|array, startFrame, stopFrame, attD = 0.005, relD = 0.01|
+						var sus ;
+						attD = (attD*Server.local.sampleRate).trunc.asInteger ;
+						relD = (relD*Server.local.sampleRate).trunc.asInteger ;
+						sus = stopFrame-startFrame-attD-relD;
+						Env.new([0,1,1,0], [attD, sus, relD], [-3,\linear,3])
+						.asSignal(stopFrame-startFrame).collect{|i| i}
+						*
+						array[startFrame..stopFrame]
+					};
+
+					fileToFloatArray.clump(2048).size.collect{|k|
+						var sliceFile = SoundFile.new.headerFormat_("WAV").sampleFormat_("int24").numChannels_(1) ;
+						var sliceEnv = env.(fileToFloatArray, 0 + (k*2048),  2048 + (k*2048)) // between 1 and 2 secs
+						.as(FloatArray);
+						//var subFolder = File.mkdir(~analysisPath ++ ~newFolder);
+						//data.plot; //UNCOMMENT TO PLOT ALL THE NEW FILES - IT ADDS CALCULATION TIME
+						sliceFile.openWrite(slicesFolder ++ "/" ++ "slice_" ++ "_" ++ k ++".wav") ;
+						sliceFile.writeData(sliceEnv);
+						sliceFile.close ;
+					};
+
+					//update the tablepath
+					tablePath =  slicesFolder ++ "/";
+			        tablePath.postln;
+					files = {|tablePath| ["/*.wav", "/*.aiff"].collect{|item|  (tablePath ++ item).pathMatch}.flatten };
+	                files.value(tablePath).postln;
+					fileNames = files.value(tablePath).collect{|i| PathName(i).fileName};
+                    //update the menu items
+					menu[i].items = fileNames;
+				},
+				fileMode: 0,
+                stripResult: true);
+
+
+
+			});
+			slotGrid[i][2].addSpanning(splitFile[i], 0, 5);
+
 			dataToPDF[i] = defs.nuPGButton([["toPDF"]], 20, 50)
 			.action_({dataPlotter.saveData(data.data_sequencer[i][dataSlot].value, 400, 100)});
 
-			slotGrid[i][2].addSpanning(dataToPDF[i], 0, 3);
+			slotGrid[i][2].addSpanning(dataToPDF[i], 0, 6);
 
 		};
 

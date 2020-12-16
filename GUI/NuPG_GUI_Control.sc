@@ -36,12 +36,13 @@ NuPG_GUI_Control {
 			//define
 			trainSelectButton[i] = defs.nuPGButton(
 				[[ (i + 1).asString, Color.black],
-				 [ (i + 1).asString, Color.black, Color.new255(250, 100, 90)]], 25, 15)
+					[ (i + 1).asString, Color.black, Color.new255(250, 100, 90)]], 25, 15)
 			.action_({|butt|
-							var st = butt.value;
-							switch(st,
-								0, {},
-					1, {views.collect{|k| k.stack.index = i};
+				var st = butt.value;
+				switch(st,
+					0, {},
+					1, {
+						views.collect{|k| k.stack.index = i};
 						trainSelectButton[shift[i][0]].valueAction_(0);
 						trainSelectButton[shift[i][1]].valueAction_(0);
 			} )});
@@ -50,45 +51,45 @@ NuPG_GUI_Control {
 				[[ "[n]", Color.white, Color.grey],
 					[ "|>", Color.black, Color.new255(250, 100, 90)]], 25, 30)
 			.action_({|butt|
-							var st = butt.value;
-							switch(st,
-								0, {NuPG_Ndefs.trains[i].stop;},
+				var st = butt.value;
+				switch(st,
+					0, {NuPG_Ndefs.trains[i].stop;},
 					1, {NuPG_Ndefs.trains[i].play} )});
 
 			sequencePlayButton[i] = defs.nuPGButton(
 				[[ "[s]", Color.white, Color.grey],
 					[ "|>", Color.black, Color.new255(250, 100, 90)]], 25, 30)
 			.action_({|butt|
-							var st = butt.value;
-							switch(st,
-								0, {pattern.task[i].stop;
+				var st = butt.value;
+				switch(st,
+					0, {pattern.task[i].stop;
 
-									5.do{|l|
-										var microparams = [
-											\micro_trigFreqMult,
-											\micro_grainMult,
-											\micro_envRateMult,
-											\micro_panMult,
-											\micro_ampMult
-										];
+						5.do{|l|
+							var microparams = [
+								\micro_trigFreqMult,
+								\micro_grainMult,
+								\micro_envRateMult,
+								\micro_panMult,
+								\micro_ampMult
+							];
 
-										var defaults = [1,1,1,0,1];
+							var defaults = [1,1,1,0,1];
 
-										NuPG_Ndefs.trains[i].set(
-											microparams[l], defaults[l])};
-								},
+							NuPG_Ndefs.trains[i].set(
+								microparams[l], defaults[l])};
+					},
 					1, {pattern.task[i].play;} )
 
 			});
-		    //put them in order
+			//put them in order
 			allButtons = [trainSelectButton[i], trainPlayButton[i], sequencePlayButton[i]];
-           //add to slots
+			//add to slots
 			3.collect{|l| slotGrid[i].addSpanning(allButtons[l], 0, l) };
 		};
 		//local presets
 		//preset
 		presetNumberBox = 3.collect{};
-	    targetPresetNumberBox = 3.collect{};
+		targetPresetNumberBox = 3.collect{};
 		interpolationSlider = 3.collect{};
 		interpolationArray = 3.collect{};
 
@@ -125,7 +126,7 @@ NuPG_GUI_Control {
 
 					copy = [
 						data.data_pulsaret[i].value,
-						 data.data_envelope[i].value,
+						data.data_envelope[i].value,
 						data.data_frequency[i].value];
 
 					3.collect{|l|
@@ -158,7 +159,7 @@ NuPG_GUI_Control {
 
 		};
 
-        //add trainSelectButtons++rainPlayButtons++sequencePlayButons
+		//add trainSelectButtons++rainPlayButtons++sequencePlayButons
 		3.collect{|i| layout.addSpanning(slots[i], i, 0)};
 		//add local presets
 		3.collect{|i| layout.addSpanning(slots[3+i], i, 1, columnSpan: 10) };
