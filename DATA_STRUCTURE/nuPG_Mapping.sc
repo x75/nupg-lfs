@@ -37,65 +37,74 @@ NuPG_Mapping {
 			};
 			//sequencer
 			5.collect{|l| sequencer[i][l].connect(gui[2].multisliders[i][l])};
-			//sequencerSpeed
-			sequencerSpeed[i][0].connect(gui[3].slider[i]);
 			//sequencerRanges
 			5.collect{|l| 2.collect{|k| sequencerRanges[i][l][k].connect(gui[2].ranges[i][l][k]) }};
+			//local scrubber
+			5.collect{|l| data.data_scrubberPositionLocal[i][l].connect(gui[2].scrubberSlider[i][l])};
+			//sequencerSpeed
+			sequencerSpeed[i][0].connect(gui[3].slider[i]);
+			sequencerSpeed[i][0].connect(gui[3].numberBox[i]);
 			//matrix
 			//7.collect{|l| 4.collect{|k| matrix[i][l][k].connect(gui[4].matrix[i][l][k]) } };
 			//modulators
-			4.collect{|l| 2.collect{|k| modulators[i][l][k].connect(gui[5][l].sliders[i][k]) };
-				              2.collect{|k| modulators[i][l][k].connect(gui[5][l].numBoxes[i][k]) }
+			/*4.collect{|l| 2.collect{|k| modulators[i][l][k].connect(gui[5][l].sliders[i][k]) };
+				          2.collect{|k| modulators[i][l][k].connect(gui[5][l].numBoxes[i][k]) }
 			};
 			//wavefold
-			4.collect{|l| 2.collect{|k| wavefold[i][l][k].connect(gui[5][l].wf_ranges[i][k]) }};
+			4.collect{|l| 2.collect{|k| wavefold[i][l][k].connect(gui[5][l].wf_ranges[i][k]) }};*/
 			//probabilityMask
-			probabilityMask[i][0].connect(gui[6].probabilityNumberBox[i]);
+			probabilityMask[i][0].connect(gui[4].probabilityNumberBox[i]);
 			//burstMask
-			2.collect{|l| burstMask[i][l].connect(gui[6].burstNumberBoxes[i][l]) };
+			2.collect{|l| burstMask[i][l].connect(gui[4].burstNumberBoxes[i][l]) };
 			//channelMask
-			channelMask[i][0].connect(gui[6].channelNumberBox[i]);
+			channelMask[i][0].connect(gui[4].channelNumberBox[i]);
 			//sieve mask
-			sieveMask[i][0].connect(gui[7].sieveOnOff[i]);
+			sieveMask[i][0].connect(gui[5].sieveOnOff[i]);
 			//sieve sequence
 			//sieveSequence[i][0].connect(gui[7].sieveSequence[i] );
 			//tables
-			pulsaret[i].connect(gui[8].multisliders[i][0]);
-			envelope[i].connect(gui[8].multisliders[i][1]);
-			frequency[i].connect(gui[8].multisliders[i][2]);
+			pulsaret[i].connect(gui[6].multisliders[i][0]);
+			envelope[i].connect(gui[6].multisliders[i][1]);
+			frequency[i].connect(gui[6].multisliders[i][2]);
 			//table editors
-			pulsaret[i].connect(gui[9].multisliders[i]);
-			envelope[i].connect(gui[10].multisliders[i]);
-			frequency[i].connect(gui[11].multisliders[i]);
+			//pulsaret
+			pulsaret[i].connect(gui[7].multisliders[i]);
+			//envelope
+			envelope[i].connect(gui[8].multisliders[i]);
+			//env dftZoom
+			envDftZoom[i][0].connect(gui[8].dftZoomValue[i]);
+			//frequency
+			frequency[i].connect(gui[9].multisliders[i]);
 			//pulsaret shaper
-			pulsaretShaper[i][0].connect(gui[12].multislider[i]);
+			pulsaretShaper[i][0].connect(gui[10].multislider[i]);
 			//sequencer editors
-			5.collect{|l| sequencer[i][l].connect(gui[13][l].multislider[i])};
+			5.collect{|l|
+				sequencer[i][l].connect(gui[11][l].multislider[i]);
+				2.collect{|k| sequencerRanges[i][l][k].connect(gui[11][l].numBox[i][k]) }
+			};
 			//presets
-			data.conductor[trainConductors[i].asSymbol].preset.presetCV.connect(gui[14].presetNumberBox[i]);
-			data.conductor[trainConductors[i].asSymbol].preset.targetCV.connect(gui[14].targetPresetNumberBox[i]);
-			data.conductor[trainConductors[i].asSymbol].preset.interpCV.connect(gui[14].interpolationSlider[i]);
+			data.conductor[trainConductors[i].asSymbol].preset.presetCV.connect(gui[12].presetNumberBox[i]);
+			data.conductor[trainConductors[i].asSymbol].preset.targetCV.connect(gui[12].targetPresetNumberBox[i]);
+			data.conductor[trainConductors[i].asSymbol].preset.interpCV.connect(gui[12].interpolationSlider[i]);
 			//pulsaretFFT
 			//pulsaretFFT[i][0].connect(gui[15].multislider[i]);
-			//env dftZoom
-			envDftZoom[i][0].connect(gui[10].dftZoomValue[i]);
-			//scrubber
-			scrubbPosition[i][0].connect(gui[15].slider[i]);
-			//local preset - pulsaret waveform editor
-			data.conductor[trainConductors[i].asSymbol][\con_pul].preset.presetCV.connect(gui[9].presetNumberBox[i]);
-			data.conductor[trainConductors[i].asSymbol][\con_pul].preset.targetCV.connect(gui[9].targetPresetNumberBox[i]);
-			data.conductor[trainConductors[i].asSymbol][\con_pul].preset.interpCV.connect(gui[9].interpolationSlider[i]);
-			//local preset - envelope editor
-			data.conductor[trainConductors[i].asSymbol][\con_env].preset.presetCV.connect(gui[10].presetNumberBox[i]);
-			data.conductor[trainConductors[i].asSymbol][\con_env].preset.targetCV.connect(gui[10].targetPresetNumberBox[i]);
-			data.conductor[trainConductors[i].asSymbol][\con_env].preset.interpCV.connect(gui[10].interpolationSlider[i]);
-			//local preset - frequency editor
-			data.conductor[trainConductors[i].asSymbol][\con_freq].preset.presetCV.connect(gui[11].presetNumberBox[i]);
-			data.conductor[trainConductors[i].asSymbol][\con_freq].preset.targetCV.connect(gui[11].targetPresetNumberBox[i]);
-			data.conductor[trainConductors[i].asSymbol][\con_freq].preset.interpCV.connect(gui[11].interpolationSlider[i]);
 
-			//local scrubber
-			5.collect{|l| data.data_scrubberPositionLocal[i][l].connect(gui[2].scrubberSlider[i][l])}
+			//scrubber
+			scrubbPosition[i][0].connect(gui[13].slider[i]);
+			//local preset - pulsaret waveform editor
+			data.conductor[trainConductors[i].asSymbol][\con_pul].preset.presetCV.connect(gui[7].presetNumberBox[i]);
+			data.conductor[trainConductors[i].asSymbol][\con_pul].preset.targetCV.connect(gui[7].targetPresetNumberBox[i]);
+			data.conductor[trainConductors[i].asSymbol][\con_pul].preset.interpCV.connect(gui[7].interpolationSlider[i]);
+			//local preset - envelope editor
+			data.conductor[trainConductors[i].asSymbol][\con_env].preset.presetCV.connect(gui[8].presetNumberBox[i]);
+			data.conductor[trainConductors[i].asSymbol][\con_env].preset.targetCV.connect(gui[8].targetPresetNumberBox[i]);
+			data.conductor[trainConductors[i].asSymbol][\con_env].preset.interpCV.connect(gui[8].interpolationSlider[i]);
+			//local preset - frequency editor
+			data.conductor[trainConductors[i].asSymbol][\con_freq].preset.presetCV.connect(gui[9].presetNumberBox[i]);
+			data.conductor[trainConductors[i].asSymbol][\con_freq].preset.targetCV.connect(gui[9].targetPresetNumberBox[i]);
+			data.conductor[trainConductors[i].asSymbol][\con_freq].preset.interpCV.connect(gui[9].interpolationSlider[i]);
+
+
 		}
 	}
 

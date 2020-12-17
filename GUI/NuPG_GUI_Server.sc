@@ -13,7 +13,9 @@ NuPG_GUI_Server {
 		var formatList;
 		var defs = NuPG_GUI_definitions;
 		var server;
+		var outchannels = 2;
 
+		("nuPG OUTPUT: " ++ " GUI_Server.build").postln;
 
 		window = Window.new("SERVER",
 			Rect.fromArray(defs.nuPGDimensions[6]), resizable: false);
@@ -28,17 +30,27 @@ NuPG_GUI_Server {
 		2.collect{|i| slots[i].layout_(slotGrid[i])};
 
 		slotGrid[0].addSpanning(defs.nuPGText("_OUTPUT", 20, 70), 0, 0);
-		//server output
-		server = defs.nuPGMenu(ServerOptions.outDevices, 0)
-		.action_({|sl|
-			var st = sl.value;
-			//select an input device
-			Server.default.options.outDevice = ServerOptions.outDevices[st];
-			//post selection
-			("nuPG OUTPUT: " ++ ServerOptions.outDevices[st]).postln;
-		});
+
+		("nuPG OUTPUT: " ++ " GUI_Server.build before output").postln;
+		("nuPG OUTPUT: " ++ " GUI_Server.build trying output").postln;
+		// ("nuPG OUTPUT: " ++ " GUI_Server.build " ++ ServerOptions.outDevices).postln;
+		("nuPG OUTPUT: " ++ " GUI_Server.build " ++ outchannels).postln;
+
+		// TODO detect platform linux and deflect
+
+		// //server output
+		// server = defs.nuPGMenu(ServerOptions.outDevices, 0)
+		// .action_({|sl|
+		// 	var st = sl.value;
+		// 	//select an input device
+		// 	Server.default.options.outDevice = ServerOptions.outDevices[st];
+		// 	//post selection
+		// 	("nuPG OUTPUT: " ++ ServerOptions.outDevices[st]).postln;
+		// });
 		slotGrid[0].addSpanning(server, 0, 1);
 
+		("nuPG OUTPUT: " ++ " GUI_Server.build after output before boot").postln;
+		
 		//server boot
 		server = defs.nuPGButton(
 			[   [ "BOOT", Color.white, Color.grey],
