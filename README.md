@@ -41,9 +41,9 @@ $ cd
 $ mkdir -p ${HOME}/.local/share/SuperCollider/Extension/Nu_PG_2.0
 ```
 
-Exact pronounciation of the folder name (WIP) doesn't matter, just need to stick to it, SuperCollider is agnostic when loading stuff on init.
+Exact spelling of the folder name (WIP) doesn't matter, just need to stick to it, SuperCollider is agnostic when loading stuff on init.
 
-the 'install' by copying all stuff to the SC user library
+Then 'install' by copying all nuPg stuff into the SC user extension library, with
 
 ``` bash
 rsync -av --progress DATA_STRUCTURE FILES GUI SYNTHESIS TABLES ${HOME}/.local/share/SuperCollider/Extensions/Nu_PG_2.0/
@@ -51,8 +51,8 @@ rsync -av --progress DATA_STRUCTURE FILES GUI SYNTHESIS TABLES ${HOME}/.local/sh
 
 ## Startup
 
-Loading nuPg is easy, jut copy the class code into your extensions dir.
+Loading nuPg is easy, jut copy the class code into your extensions dir, see above.
 
 Running it requires to create couple of classes in the right way and in the right sequence order.
 
-Other people have thought about it and it can be done. Stay tuned, WIP.
+Other people have thought about it and it can be done. `startup.scd`, Stay tuned, WIP.
